@@ -1,8 +1,18 @@
 from fastapi import APIRouter, status
-from car_api.schemas.users import UserListPublicSchema
+from car_api.schemas.users import UserListPublicSchema, UserSchema, UserPublicSchema
+from car_api.db import USERS
 
 
 router = APIRouter()
+
+@router.post(
+    path="/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserPublicSchema,
+)
+async def create_user(user: UserSchema):
+    user_id = UserPublicSchema(**user.model_dump(), id=len(USERS) + 1)
+    return user_id
 
 
 @router.get(
@@ -11,22 +21,25 @@ router = APIRouter()
     response_model=UserListPublicSchema,
 )
 async def list_users():
-    return {
-        "users": [
-            {
-                "id": 1,
-                "name": "John Doe",
-                "email": "John.Doe@example.com",
-            },
-            {
-                "id": 2,
-                "name": "Jane Smith",
-                "email": "Jane.Smith@example.com",
-            },
-            {
-                "id": 3,
-                "name": "Alice Johnson",
-                "email": "Alice.Johnson@example.com",
-            },
-        ]
-    }
+    return {"users": USERS}
+
+
+@router.put(
+    path="/{user_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=UserPublicSchema,
+)
+async def update_user(user_id: int, user: UserSchema):
+    user_with_id = UserPublicSchema(**user.model_dump(), id=user_id)
+    USERS[user_id - 1] = user_with_id
+    return user_with_id
+
+
+@router.delete(
+    path="/{user_id}",
+    status_code=status.HTTP_200_OK,
+)
+async def delete_user(user_id: int):
+    if user_id <= len(USERS):
+        del USERS[user_id - 1]
+        return {"message": "User deleted successfully"}
