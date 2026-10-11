@@ -104,3 +104,8 @@ Com a aplicação em execução, acesse a documentação interativa pelo navegad
 | `GET` | `/api/v1/users/` | Retorna a lista de usuários cadastrados |
 | `POST` | `/api/v1/users/` | Cria um novo usuário |
 
+### Gerar migrações com Alembic
+- **Comando**: `poetry run alembic revision --autogenerate -m "<message>"`
+
+### Aplicar migrações com Alembic
+- **Comando**: `poetry run alembic upgrade head`
